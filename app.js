@@ -1,8 +1,8 @@
 // State - Updated with verified prices (April 15, 2026)
 let state = {
-    stockPrice: 23.70,  // Verified via web search: $23.40-$24.07 range
-    warrantPrice: 3.40, // Verified via web search: $3.30-$3.49 range
-    callPrice: 1.03,    // Oct 2026 $32 call - verify manually
+    stockPrice: 24.69,  // Verified via web search: $23.40-$24.07 range
+    warrantPrice: 3.65, // Verified via web search: $3.30-$3.49 range
+    callPrice: 1.76,    // Oct 2026 $32 call - verify manually
     budget: 500,
     targetPrice: 50,
     strategy: 'sell',
@@ -196,7 +196,7 @@ async function fetchLivePrices() {
     try {
         // IMPORTANT: Replace 'YOUR-PROJECT-NAME' with your actual Vercel project name
         // After deploying to Vercel, your URL will be: https://YOUR-PROJECT-NAME.vercel.app
-        const response = await fetch('https://gme-price.vercel.app');
+        const response = await fetch('https://gme-price.vercel.app/api/prices');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
