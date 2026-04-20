@@ -95,7 +95,7 @@ const countdowns = [
 
 // Track celebrations to avoid spam
 let celebrationActive = {
-    '420': false,
+    '420': true,
     '609': false,
     'option': false,
     'warrant': false
