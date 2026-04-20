@@ -320,6 +320,84 @@
             letter-spacing: 0.8px;
             font-weight: 600;
         }
+
+        /* Celebration Animations */
+        .countdown-clock.celebrating {
+            animation: celebrationPulse 1s ease-in-out infinite;
+            border-color: var(--celebration-color, var(--cs-purple));
+            box-shadow: 0 0 20px var(--celebration-color, var(--cs-purple));
+        }
+
+        @keyframes celebrationPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 20px var(--celebration-color);
+            }
+            50% { 
+                transform: scale(1.03);
+                box-shadow: 0 0 40px var(--celebration-color);
+            }
+        }
+
+        /* 420 Celebration - Green */
+        .countdown-clock.celebrating-420 {
+            --celebration-color: #00ff00;
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1) 0%, rgba(0, 200, 0, 0.05) 100%);
+        }
+
+        /* 69 Celebration - Purple */
+        .countdown-clock.celebrating-69 {
+            --celebration-color: #9d4edd;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.1) 0%, rgba(125, 63, 184, 0.05) 100%);
+        }
+
+        /* Options/Warrant Expiration - Gold */
+        .countdown-clock.celebrating-expiry {
+            --celebration-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 185, 0, 0.05) 100%);
+        }
+
+        /* Fire/Lighter Emoji Animation for 420 */
+        .celebration-emoji {
+            position: fixed;
+            font-size: 40px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            animation: floatUp 3s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-300px) rotate(20deg);
+            }
+        }
+
+        /* Confetti for other celebrations */
+        .celebration-confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 9999;
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
         
         .loading-status {
             text-align: center;

@@ -1,8 +1,8 @@
 // State - Updated with verified prices (April 15, 2026)
 let state = {
-    stockPrice: 24.69,  // Verified via web search: $23.40-$24.07 range
-    warrantPrice: 3.65, // Verified via web search: $3.30-$3.49 range
-    callPrice: 1.76,    // Oct 2026 $32 call - verify manually
+    stockPrice: 23.70,  // Verified via web search: $23.40-$24.07 range
+    warrantPrice: 3.40, // Verified via web search: $3.30-$3.49 range
+    callPrice: 1.03,    // Oct 2026 $32 call - verify manually
     budget: 500,
     targetPrice: 50,
     strategy: 'sell',
@@ -85,13 +85,23 @@ document.addEventListener('mouseup', (e) => {
     }
 });
 
-// Countdown targets
+// Countdown targets with auto-reset
 const countdowns = [
-    { id: '420', date: new Date('2026-04-20T00:00:00') },
-    { id: '609', date: new Date('2026-06-09T00:00:00') },
-    { id: 'option', date: new Date('2026-10-16T16:00:00') },
-    { id: 'warrant', date: new Date('2026-10-31T23:59:59') }
+    { id: '420', date: new Date('2026-04-20T00:00:00'), type: '420', resetTo: '2027-04-20T00:00:00' },
+    { id: '609', date: new Date('2026-06-09T00:00:00'), type: '69', resetTo: '2027-06-09T00:00:00' },
+    { id: 'option', date: new Date('2026-10-16T16:00:00'), type: 'expiry', resetTo: null },
+    { id: 'warrant', date: new Date('2026-10-31T23:59:59'), type: 'expiry', resetTo: null }
 ];
+
+// Track celebrations to avoid spam
+let celebrationActive = {
+    '420': false,
+    '609': false,
+    'option': false,
+    'warrant': false
+};
+
+let lastCelebrationCheck = Date.now();
 
 // Easter egg - kitty descends from top
 let easterEggClicks = 0;
@@ -143,12 +153,139 @@ document.getElementById('easterEgg').addEventListener('click', function(e) {
     }, 2500);
 });
 
+// Celebration Functions
+function celebrate420() {
+    // Flash green on the 420 clock
+    const clock420 = document.querySelector('.countdown-grid .countdown-clock:first-child');
+    if (clock420) {
+        clock420.classList.add('celebrating', 'celebrating-420');
+    }
+    
+    // Spawn fire/lighter emojis randomly
+    const emojis = ['🔥', '🔥', '🔥', '💨', '🌿'];
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    
+    const element = document.createElement('div');
+    element.className = 'celebration-emoji';
+    element.textContent = emoji;
+    element.style.left = Math.random() * window.innerWidth + 'px';
+    element.style.top = window.innerHeight + 'px';
+    
+    document.body.appendChild(element);
+    
+    setTimeout(() => element.remove(), 3000);
+}
+
+function celebrate69() {
+    // Flash purple on the 69 clock
+    const clock69 = document.querySelectorAll('.countdown-grid .countdown-clock')[1];
+    if (clock69) {
+        clock69.classList.add('celebrating', 'celebrating-69');
+    }
+    
+    // Purple confetti
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'celebration-confetti';
+            confetti.style.background = '#9d4edd';
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.top = '0px';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 3000);
+        }, i * 100);
+    }
+}
+
+function celebrateExpiry(type) {
+    // Gold flash for expiry dates
+    const clocks = document.querySelectorAll('.countdown-grid .countdown-clock');
+    const clock = type === 'option' ? clocks[2] : clocks[3];
+    
+    if (clock) {
+        clock.classList.add('celebrating', 'celebrating-expiry');
+    }
+    
+    // Gold confetti burst
+    for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'celebration-confetti';
+            confetti.style.background = '#ffd700';
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.top = '0px';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 3000);
+        }, i * 80);
+    }
+}
+
+function checkCelebrations(now) {
+    // Only check celebrations every 5 seconds to avoid spam
+    if (now - lastCelebrationCheck < 5000) return;
+    lastCelebrationCheck = now;
+    
+    countdowns.forEach(countdown => {
+        const targetDate = new Date(countdown.date);
+        const isToday = now.toDateString() === targetDate.toDateString();
+        
+        if (isToday && !celebrationActive[countdown.id]) {
+            celebrationActive[countdown.id] = true;
+            
+            // Trigger appropriate celebration
+            if (countdown.type === '420') {
+                // Spawn fire emojis every 2 seconds during 4/20
+                setInterval(() => {
+                    const stillToday = new Date().toDateString() === targetDate.toDateString();
+                    if (stillToday) celebrate420();
+                }, 2000);
+            } else if (countdown.type === '69') {
+                celebrate69();
+                // Repeat every 10 seconds during the day
+                setInterval(() => {
+                    const stillToday = new Date().toDateString() === targetDate.toDateString();
+                    if (stillToday) celebrate69();
+                }, 10000);
+            } else if (countdown.type === 'expiry') {
+                celebrateExpiry(countdown.id);
+            }
+        }
+        
+        // Reset celebration flag when day passes
+        if (!isToday && celebrationActive[countdown.id]) {
+            celebrationActive[countdown.id] = false;
+            
+            // Remove celebration classes
+            document.querySelectorAll('.countdown-clock').forEach(clock => {
+                clock.classList.remove('celebrating', 'celebrating-420', 'celebrating-69', 'celebrating-expiry');
+            });
+        }
+    });
+}
+
+
 // Update countdown clocks
 function updateCountdowns() {
     const now = new Date();
     
+    // Check for celebrations
+    checkCelebrations(now);
+    
     countdowns.forEach(countdown => {
-        const diff = countdown.date - now;
+        let targetDate = new Date(countdown.date);
+        
+        // Auto-reset logic - if date has passed and reset is available
+        if (now > targetDate && countdown.resetTo) {
+            countdown.date = new Date(countdown.resetTo);
+            targetDate = new Date(countdown.date);
+            
+            // Update the next year's reset target
+            const nextYear = new Date(countdown.resetTo);
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            countdown.resetTo = nextYear.toISOString();
+        }
+        
+        const diff = targetDate - now;
         
         if (diff > 0) {
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -196,7 +333,7 @@ async function fetchLivePrices() {
     try {
         // IMPORTANT: Replace 'YOUR-PROJECT-NAME' with your actual Vercel project name
         // After deploying to Vercel, your URL will be: https://YOUR-PROJECT-NAME.vercel.app
-        const response = await fetch('https://gme-price.vercel.app/api/prices');
+        const response = await fetch('https://YOUR-PROJECT-NAME.vercel.app/api/prices');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
